@@ -73,7 +73,7 @@ export import std;
 #endif
 
 namespace fix {
-    ::std::ios_base& boolalpha(::std::ios_base& __base)
+    inline ::std::ios_base& boolalpha(::std::ios_base& __base)
     {
         __base.setf(::std::ios_base::boolalpha);
         return __base;
