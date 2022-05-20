@@ -52,6 +52,7 @@ export import std;
 #define __has_builtin(...) __has_##__VA_ARGS__
 #endif
 
+#include <initializer_list>
 #include <array>
 #include <cstdint>
 #include <iostream>
@@ -70,6 +71,14 @@ export import std;
 #if defined(__cpp_lib_source_location)
 #include <source_location>
 #endif
+
+namespace fix {
+    ::std::ios_base& boolalpha(::std::ios_base& __base)
+    {
+        __base.setf(::std::ios_base::boolalpha);
+        return __base;
+    }
+}
 
 #if defined(__cpp_modules) && !defined(BOOST_UT_DISABLE_MODULE)
 export
@@ -1166,7 +1175,7 @@ class reporter {
     };
     printer_ << "\n  " << short_name(assertion.location.file_name()) << ':'
              << assertion.location.line() << ':' << printer_.colors().fail
-             << "FAILED" << printer_.colors().none << " [" << std::boolalpha
+             << "FAILED" << printer_.colors().none << " [" << fix::boolalpha
              << assertion.expr << printer_.colors().none << ']';
     ++asserts_.fail;
   }
