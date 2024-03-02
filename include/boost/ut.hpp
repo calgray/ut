@@ -2619,6 +2619,10 @@ constexpr auto operator""_b(const char* name, decltype(sizeof("")) size) {
   };
   return named{{name, size}, {}};
 }
+
+[[nodiscard]] constexpr auto operator""_str(const char* v, std::size_t size) {
+  return detail::value{std::string_view{v, size}};
+}
 }  // namespace literals
 
 namespace operators {
@@ -3039,6 +3043,7 @@ using _u64 = detail::value<std::uint64_t>;
 using _f = detail::value<float>;
 using _d = detail::value<double>;
 using _ld = detail::value<long double>;
+using _str = detail::value<std::string_view>;
 
 template <class T>
 struct _t : detail::value<T> {
@@ -3283,6 +3288,7 @@ using literals::operator""_f;
 using literals::operator""_d;
 using literals::operator""_ld;
 using literals::operator""_ull;
+using literals::operator""_str;
 
 using operators::operator==;
 using operators::operator!=;
