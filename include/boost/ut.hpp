@@ -83,6 +83,7 @@
 #include <iostream>
 #include <memory>
 #include <optional>
+#include <regex>
 #include <sstream>
 #include <stack>
 #include <string_view>
@@ -239,18 +240,6 @@ template <class T = std::string_view, class TDelim>
     first = second + 1;
   }
   return output;
-}
-constexpr auto regex_match(const char *str, const char *pattern) -> bool {
-  if (*pattern == '\0' && *str == '\0') return true;
-  if (*pattern == '\0' && *str != '\0') return false;
-  if (*str == '\0' && *pattern != '\0') return false;
-  if (*pattern == '.') {
-    return regex_match(str+1, pattern+1);
-  }
-  if (*pattern == *str) {
-    return regex_match(str+1, pattern+1);
-  }
-  return false;
 }
 }  // namespace utility
 
@@ -825,7 +814,7 @@ struct cfg {
     query_pattern = "";
     bool found_first_option = false;
     for (auto i = 1U; i < n_args; i++) {
-      std::string cmd(argv[i]);
+      const std::string cmd(argv[i]);
       auto cmd_option = find_arg(cmd);
       if (!cmd_option.has_value()) {
         if (found_first_option) {
@@ -2093,10 +2082,10 @@ class runner {
     }
 
     if (!detail::cfg::query_pattern.empty()) {
-      const static auto regex = detail::cfg::query_regex_pattern;
-      bool matches = utility::regex_match(test.name.data(), regex.c_str());
+      const std::regex filter = std::regex(detail::cfg::query_regex_pattern);
+      bool matches = std::regex_match(test.name.data(), filter);
       for (const auto& tag2 : test.tag) {
-        matches |= utility::regex_match(tag2.data(), regex.c_str());
+        matches |= std::regex_match(tag2.data(), filter);
       }
       if (matches) {
         execute = !detail::cfg::invert_query_pattern;
