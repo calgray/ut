@@ -1775,9 +1775,11 @@ class reporter_junit {
       active_scope_->status = "SKIPPED";
       active_scope_->skipped += 1;
       if (report_type_ == CONSOLE) {
-        lcout_ << '\n' << std::string(2 * active_test_.size() - 2, ' ');
-        lcout_ << "Running \"" << test_event.name << "\"... ";
-        lcout_ << color_.skip << "SKIPPED" << color_.none;
+        if (detail::cfg::show_successful_tests) {
+          lcout_ << '\n' << std::string(2 * active_test_.size() - 2, ' ');
+          lcout_ << "Running \"" << test_event.name << "\"... ";
+          lcout_ << color_.skip << "SKIPPED" << color_.none;
+        }
       }
       reset_printer();
       pop_scope(test_event.name);
@@ -1894,13 +1896,18 @@ class reporter_junit {
             << color_.none << '\n';
         std::cerr << std::endl;
       } else {
-        out_stream << color_.pass << "Suite '" << suite_name
-                  << "': all tests passed" << color_.none << " ("
+        if(suite_result.n_tests == suite_result.skipped && suite_result.skipped) {
+          out_stream << color_.skip << "Suite '" << suite_name
+                  << "': all tests skipped" << color_.none << " ("
                   << suite_result.assertions << " asserts in "
                   << suite_result.n_tests << " tests)\n";
-
-        if (suite_result.skipped) {
-          std::cout << suite_result.skipped << " tests skipped\n";
+        }
+        else {
+          out_stream << color_.pass << "Suite '" << suite_name
+                  << "': all tests passed" << color_.none << " ("
+                  << suite_result.assertions << " asserts in "
+                  << suite_result.n_tests << " tests, "
+                  << suite_result.skipped << " tests skipped)\n";
         }
 
         std::cout.flush();
